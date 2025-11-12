@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ToDo List </title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .board { display: flex; gap: 10px; }
+        .column { flex: 1; background: #f0f0f0; padding: 10px; border-radius: 8px; min-height: 300px; }
+        .task { background: #fff; margin: 8px 0; padding: 10px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        h3 { text-align: center; }
+    </style>
+</head>
+<body>
+<h1 style="text-align:center;">ToDo List Kanban</h1>
+
+<div class="board">
+    <div class="column">
+        <h3>Создана</h3>
+        <div th:each="task : ${tasks}" th:if="${task.status} == T(project.ToDoList.entity.Status).CREATED" class="task">
+            <strong th:text="${task.title}">Task title</strong>
+            <p th:text="${task.desc}">Description</p>
+        </div>
+    </div>
+
+    <div class="column">
+        <h3>В процессе</h3>
+        <div th:each="task : ${tasks}" th:if="${task.status} == T(project.ToDoList.entity.Status).IN_PROGRESS" class="task">
+            <strong th:text="${task.title}">Task title</strong>
+            <p th:text="${task.desc}">Description</p>
+        </div>
+    </div>
+
+    <div class="column">
+        <h3>После дедлайна</h3>
+        <div th:each="task : ${tasks}" th:if="${task.status} == T(project.ToDoList.entity.Status).OVERDUE" class="task">
+            <strong th:text="${task.title}">Task title</strong>
+            <p th:text="${task.desc}">Description</p>
+        </div>
+    </div>
+
+    <div class="column">
+        <h3>Закончена</h3>
+        <div th:each="task : ${tasks}" th:if="${task.status} == T(project.ToDoList.entity.Status).COMPLETED" class="task">
+            <strong th:text="${task.title}">Task title</strong>
+            <p th:text="${task.desc}">Description</p>
+        </div>
+    </div>
+
+    <div class="column">
+        <h3>Неактивна</h3>
+        <div th:each="task : ${tasks}" th:if="${task.status} == T(project.ToDoList.entity.Status).INACTIVE" class="task">
+            <strong th:text="${task.title}">Task title</strong>
+            <p th:text="${task.desc}">Description</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
