@@ -26,11 +26,7 @@ This project is intended as a personal project (pet project) for learning and de
 - **Hosting / Deployment:** Render (Web Service + PostgreSQL managed database)
 
 ---
+## 🌐 Live Demo
 
-## 📦 Getting Started
+You can access the deployed application here: [ToDoList on Render](https://to-do-list-tevj.onrender.com)
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/<your-username>/ToDoList.git
-cd ToDoList
