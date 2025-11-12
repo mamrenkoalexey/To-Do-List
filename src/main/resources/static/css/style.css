@@ -1,0 +1,226 @@
+/* =========================================================
+   GLOBAL STYLES
+   ========================================================= */
+
+body {
+    background-color: #f5f6fa; /* Light grey background */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #374151; /* Dark grey text */
+    margin: 0;
+}
+
+/* Specific body style for the tasks page to account for the fixed navbar */
+.tasks-body-padding {
+    padding-top: 70px;
+}
+
+/* =========================================================
+   AUTHENTICATION STYLES (for login.html, register.html)
+   ========================================================= */
+
+/* Center the login/register forms */
+.container {
+    /* For authentication pages, use flex to center everything vertically and horizontally */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container h2 {
+    color: #2563eb; /* Primary blue for headings */
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* Auth Card Styling - Target the <form> directly on auth pages */
+.container form {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+#new-task-form input,
+#new-task-form textarea,
+#new-task-form select {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+/* Ensure the margin bottom is consistent on the task form inputs */
+#new-task-form input, #new-task-form textarea, #new-task-form select {
+    margin-bottom: 10px;
+}
+
+
+input:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #1e40af;
+}
+
+.link {
+    display: block;
+    margin-top: 20px;
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.message-error {
+    background-color: #f8d7da; /* Light red */
+    color: #842029; /* Dark red text */
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c2c7;
+    font-size: 14px;
+    /* Ensure it works well on the auth pages */
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.message-error p {
+    margin: 0;
+}
+
+/* =========================================================
+   TASK BOARD STYLES (for tasks.html)
+   ========================================================= */
+
+/* The board container uses flex for the columns */
+.board {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    justify-content: space-around;
+    /* Responsive adjustment for small screens */
+    flex-wrap: wrap;
+}
+
+.column {
+    flex: 1;
+    min-width: 250px;
+    background-color: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.column h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #2563eb;
+}
+
+.task {
+    background-color: #e0f2fe; /* Very light blue */
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 5px solid #3b82f6; /* Blue marker */
+}
+
+.task h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.task p {
+    font-size: 13px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: #4b5563;
+}
+
+/* Style for date and priority display */
+.task-meta {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 5px;
+    border-top: 1px dashed #e5e7eb;
+    padding-top: 5px;
+}
+
+.priority-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+/* Priority Colors */
+.priority-LOW { background-color: #d1e7dd; color: #0f5132; }
+.priority-MEDIUM { background-color: #fff3cd; color: #664d03; }
+.priority-HIGH { background-color: #f8d7da; color: #842029; }
+.priority-NONE { background-color: #e5e7eb; color: #4b5563; }
+
+.btn-small {
+    padding: 3px 8px;
+    font-size: 12px;
+}
+
+/* Task Creation Form Styling */
+#new-task-form {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Media Query for responsiveness on the task board */
+@media (max-width: 1024px) {
+    .board {
+        flex-direction: column;
+        padding: 10px;
+    }
+    .column {
+        min-width: 90%;
+    }
+}

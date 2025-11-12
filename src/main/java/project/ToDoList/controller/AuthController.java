@@ -1,18 +1,19 @@
 package project.ToDoList.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import project.ToDoList.entity.User;
 import project.ToDoList.service.UserService;
 
-@RestController
+@Controller
 @RequestMapping
 public class AuthController {
+
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/login";
+    }
 
     private final UserService userService;
 
@@ -20,24 +21,35 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        try {
-            userService.register(user);
-            return ResponseEntity.ok("User: " + user.getUsername() + "registered successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    @GetMapping("/login")
+    public String showLoginPage(@RequestParam(value = "error", required = false) String error,
+                                Model model) {
+        if (error != null) {
+            model.addAttribute("error", "Invalid username or password!");
         }
-
+        return "login";
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    @GetMapping("/register")
+    public String showRegisterPage(Model model) {
+        model.addAttribute("user", new User());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String register(@ModelAttribute("user") User user, Model model) {
         try {
-            request.logout();
-            return ResponseEntity.ok("Logged out successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Logout failed");
+            userService.register(user);
+            model.addAttribute("success", "Registration successful! Please log in.");
+            return "login";
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "register";
         }
+    }
+
+    @GetMapping("/logout-success")
+    public String logoutSuccess() {
+        return "redirect:/login?logout";
     }
 }

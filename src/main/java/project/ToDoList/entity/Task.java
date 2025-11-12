@@ -1,10 +1,8 @@
 package project.ToDoList.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import project.ToDoList.entity.User;
 
 import java.time.LocalDateTime;
 
@@ -34,13 +32,6 @@ public class Task {
         this.title = title;
     }
 
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 
     public Status getStatus() {
         return status;
@@ -90,7 +81,31 @@ public class Task {
         this.user = user;
     }
 
-    private String desc;
+    @Column(name = "description")
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Task() {
+    }
+
+    public Task(Long id, String title, String description, Status status, Priority priority, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deadline, User user) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.priority = priority;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deadline = deadline;
+        this.user = user;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.CREATED;

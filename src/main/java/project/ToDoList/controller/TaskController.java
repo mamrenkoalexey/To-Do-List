@@ -1,7 +1,10 @@
 package project.ToDoList.controller;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import project.ToDoList.entity.Status;
 import project.ToDoList.entity.Task;
@@ -9,72 +12,111 @@ import project.ToDoList.entity.User;
 import project.ToDoList.service.TaskService;
 import project.ToDoList.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-
-@RestController
-@RequestMapping("api/tasks")
+@Controller
 public class TaskController {
 
     private final TaskService taskService;
     private final UserService userService;
 
     public TaskController(TaskService taskService, UserService userService) {
-
         this.taskService = taskService;
         this.userService = userService;
     }
 
-    @GetMapping
-    public List<Task> getTasks(Authentication authentication) {
-        User user = userService.findByUserName(authentication.getName());
-        return taskService.getTasksForUser(user);
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public class TaskNotFoundException extends RuntimeException {
+        public TaskNotFoundException(Long id) {
+            super("Task not found with id: " + id);
+        }
     }
 
-    @PostMapping
-    public Task createTask(@RequestBody Task task, Authentication authentication) {
+    @GetMapping("/tasks")
+    public String taskPage(Model model, Authentication authentication) {
+        User user = userService.findByUserName(authentication.getName());
+        List<Task> listTasksForUser = taskService.getTasksForUser(user);
+
+        model.addAttribute("user", user);
+        model.addAttribute("listTasks", listTasksForUser);
+
+        return "tasks";
+    }
+
+    @PostMapping("/create")
+    @ResponseBody
+    public ResponseEntity<Task> createTask(@RequestBody Task task, Authentication authentication) {
         User user = userService.findByUserName(authentication.getName());
         task.setUser(user);
-        return taskService.createTask(task);
+        task.setStatus(Status.CREATED);
+        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
+        Task createdTask = taskService.createTask(task);
+        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask, Authentication authentication) {
-        User user = userService.findByUserName(authentication.getName());
+
+    @PostMapping("/{id}/status")
+    public ResponseEntity<Task> updateStatus(@PathVariable Long id,
+                                             @RequestParam Status status,
+                                             Authentication auth) {
+
+        User user = userService.findByUserName(auth.getName());
+
         Task task = taskService.getTasksForUser(user).stream()
                 .filter(t -> t.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Task not found or not authorized"));
+                .orElse(null);
 
-        task.setTitle(updatedTask.getTitle());
-        task.setDesc(updatedTask.getDesc());
-        task.setDeadline(updatedTask.getDeadline());
-        task.setPriority(updatedTask.getPriority());
-        task.setStatus(updatedTask.getStatus());
 
-        return taskService.updateTask(task);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id, Authentication authentication) {
-        User user = userService.findByUserName(authentication.getName());
-        Task task = taskService.getTasksForUser(user).stream()
-                .filter(t -> t.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Task not found or not authorized"));
-
-        taskService.deleteTask(id);
-    }
-
-    @PatchMapping("/{id}/status")
-    public Task toggleComplete(@PathVariable Long id, @RequestParam Status status, Authentication authentication) {
-        User user = userService.findByUserName(authentication.getName());
-        Task task = taskService.getTasksForUser(user).stream()
-                .filter(t -> t.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Task not found or not authorized"));
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         task.setStatus(status);
-        return taskService.updateTask(task);
+        task.setUpdatedAt(LocalDateTime.now());
+
+        return ResponseEntity.ok(taskService.updateTask(task));
+    }
+
+
+    @PostMapping("/{id}/edit")
+    public ResponseEntity<Task> editTask(@PathVariable Long id,
+                                         @RequestBody Task updatedTask, // ИСПРАВЛЕНО: используем @RequestBody для JSON
+                                         Authentication auth) {
+        User user = userService.findByUserName(auth.getName());
+        Task task = taskService.getTasksForUser(user).stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+
+        task.setTitle(updatedTask.getTitle());
+        task.setDescription(updatedTask.getDescription());
+        task.setDeadline(updatedTask.getDeadline());
+        task.setPriority(updatedTask.getPriority());
+
+        task.setStatus(updatedTask.getStatus());
+        task.setUpdatedAt(LocalDateTime.now());
+
+        return ResponseEntity.ok(taskService.updateTask(task));
+    }
+
+    @PostMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id, Authentication auth) {
+        User user = userService.findByUserName(auth.getName());
+        Task task = taskService.getTasksForUser(user).stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+
+        if (task.getStatus() == Status.INACTIVE) {
+            taskService.deleteTask(task.getId());
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }
