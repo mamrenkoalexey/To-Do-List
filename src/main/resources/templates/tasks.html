@@ -10,8 +10,8 @@
     <!-- Link to external style file -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<!-- Класс tasks-body-padding удален -->
-<body>
+<!-- Apply the content-padding-top class to ensure content clears the fixed navbar -->
+<body class="content-padding-top">
 
 <!-- Navbar (Fixed Top) -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -35,31 +35,35 @@
     <h2 class="text-center text-primary mb-4">Task Management Board</h2>
 
     <!-- === CREATE TASK FORM === -->
-    <!-- Теперь это полноценная форма для активации нативной валидации 'required' -->
-    <form id="createForm">
-        <h5>Create New Task</h5>
-        <!-- Добавлен mb-2 для отступа -->
-        <input id="title" type="text" class="form-control mb-2" placeholder="Title" required>
-        <textarea id="description" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
-        <input id="deadline" type="datetime-local" class="form-control mb-2">
+    <!-- Form is now used for native browser validation (required fields) -->
+    <form id="createForm" class="mx-auto" style="max-width: 350px;">
+        <div id="new-task-form">
+            <h5>Create New Task</h5>
+            <input id="title" type="text" class="form-control mb-2" placeholder="Title" required>
+            <textarea id="description" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
+            <!-- ИЗМЕНЕНИЕ: тип изменен на "date" -->
+            <input id="deadline" type="date" class="form-control mb-2">
 
-        <!-- Priority Select: Нативная валидация активируется атрибутом 'required'. -->
-        <select id="priority" class="form-select mb-3" required>
-            <option value="">Select priority</option>
-            <!-- Using English display names from Priority Enum -->
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-        </select>
-        <!-- Кнопка теперь имеет type="submit" -->
-        <button type="submit" class="btn btn-primary w-100">Create</button>
+            <!-- Priority is required for native validation -->
+            <select id="priority" class="form-select mb-3" required>
+                <option value="" disabled selected>Select priority</option>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+            </select>
+
+            <!-- Type submit to trigger form validation -->
+            <button type="submit" id="createBtn" class="btn btn-primary w-100">Create</button>
+        </div>
     </form>
 
-    <!-- === TASK BOARD COLUMNS === -->
-    <div class="board">
 
-        <!-- Column: Created -->
-        <div class="column" id="created">
+    <!-- === TASK BOARD COLUMNS === -->
+    <!-- Use row/col structure for responsive layout -->
+    <div class="row board">
+
+        <!-- Column: Created (col-12 on mobile, col-md-6 on tablet, col-lg-3 on desktop) -->
+        <div class="col-12 col-md-6 col-lg-3 column" id="created">
             <h3>Created</h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'CREATED'}"
                  class="task"
@@ -75,7 +79,8 @@
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
-                    <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM HH:mm')}"></span></span>
+                    <!-- ИЗМЕНЕНИЕ: формат отображения дедлайна - только дата -->
+                    <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
                     <span th:unless="${task.deadline}">No Deadline</span> | Created: <span th:text="${#temporals.format(task.createdAt, 'dd MMM')}"></span>
                 </div>
                 <div class="d-flex justify-content-between mt-2">
@@ -86,7 +91,7 @@
         </div>
 
         <!-- Column: In Progress -->
-        <div class="column" id="inprogress">
+        <div class="col-12 col-md-6 col-lg-3 column" id="inprogress">
             <h3>In Progress</h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'IN_PROGRESS'}"
                  class="task"
@@ -102,7 +107,8 @@
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
-                    <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM HH:mm')}"></span></span>
+                    <!-- ИЗМЕНЕНИЕ: формат отображения дедлайна - только дата -->
+                    <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
                     <span th:unless="${task.deadline}">No Deadline</span> | Updated: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM')}"></span>
                 </div>
                 <div class="d-flex justify-content-between mt-2">
@@ -113,7 +119,7 @@
         </div>
 
         <!-- Column: Completed -->
-        <div class="column" id="done">
+        <div class="col-12 col-md-6 col-lg-3 column" id="done">
             <h3>Completed</h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'COMPLETED'}"
                  class="task"
@@ -139,7 +145,7 @@
         </div>
 
         <!-- Column: Inactive -->
-        <div class="column" id="inactive">
+        <div class="col-12 col-md-6 col-lg-3 column" id="inactive">
             <h3>Inactive (Archive)</h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'INACTIVE'}"
                  class="task"
@@ -173,14 +179,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="editId">
-                    <input type="text" id="editTitle" class="form-control mb-2" placeholder="Title">
-                    <textarea id="editDescription" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
-                    <input type="datetime-local" id="editDeadline" class="form-control mb-2">
+                    <!-- УДАЛЕНО: Кнопка LLM для уточнения задачи -->
 
-                    <!-- Priority Select in Modal: Нативная валидация активируется атрибутом 'required'. -->
-                    <select id="editPriority" class="form-select mb-3" required>
-                        <option value="">Select priority</option>
+                    <input type="hidden" id="editId">
+                    <input type="text" id="editTitle" class="form-control mb-2" placeholder="Title" required>
+                    <textarea id="editDescription" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
+                    <!-- ИЗМЕНЕНИЕ: тип изменен на "date" -->
+                    <input type="date" id="editDeadline" class="form-control mb-2">
+
+                    <!-- NEW FIELD: Edit Priority - also required for native validation -->
+                    <select id="editPriority" class="form-select mb-2" required>
+                        <option value="" disabled selected>Select priority</option>
                         <option value="LOW">Low</option>
                         <option value="MEDIUM">Medium</option>
                         <option value="HIGH">High</option>
@@ -194,7 +203,7 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <!-- Кнопка "Cancel" удалена по запросу пользователя. -->
+                    <!-- Removed Cancel button as requested. Close button in header remains. -->
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
@@ -204,19 +213,20 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // === CREATE TASK ===
-    document.getElementById("createForm").addEventListener("submit", async (e) => {
-        e.preventDefault(); // Остановить стандартную отправку формы для AJAX
+    // УДАЛЕНО: Функции Gemini API и константы
 
-        // Благодаря атрибутам 'required' на title и priority,
-        // браузер автоматически покажет сообщение об ошибке, если поля не заполнены.
-        // Мы доходим сюда, только если нативная валидация прошла успешно.
+    // === CREATE TASK - Form Submission Handler ===
+    document.getElementById("createForm").addEventListener("submit", async (e) => {
+        e.preventDefault(); // Prevent default form submission
+
+        // Native validation is already handled by the browser due to 'required' attributes.
 
         const data = {
             title: document.getElementById("title").value,
             description: document.getElementById("description").value,
+            // Значение с инпута type="date" будет в формате YYYY-MM-DD
             deadline: document.getElementById("deadline").value,
-            priority: document.getElementById("priority").value
+            priority: document.getElementById("priority").value // Will not be empty due to 'required'
         };
 
         const res = await fetch("/create", {
@@ -274,7 +284,9 @@
 
         // Read and set deadline from data attribute
         const deadlineValue = task.dataset.deadline;
-        document.getElementById("editDeadline").value = deadlineValue ? deadlineValue : '';
+        // ИЗМЕНЕНИЕ: Для инпута type="date" нам нужна только часть даты (YYYY-MM-DD)
+        const dateOnlyValue = deadlineValue ? deadlineValue.substring(0, 10) : '';
+        document.getElementById("editDeadline").value = dateOnlyValue;
 
         // Set priority based on data-priority attribute
         const priorityValue = task.dataset.priority;
@@ -295,21 +307,25 @@
 
     document.getElementById("editForm").addEventListener("submit", async (e) => {
         e.preventDefault();
-        // Нативная валидация 'required' для editPriority сработает при отправке формы.
+
+        // Native validation handles 'required' fields
 
         const id = document.getElementById("editId").value;
         const data = {
             title: document.getElementById("editTitle").value,
             description: document.getElementById("editDescription").value,
+            // Значение с инпута type="date" будет в формате YYYY-MM-DD
             deadline: document.getElementById("editDeadline").value,
             status: document.getElementById("editStatus").value,
-            priority: document.getElementById("editPriority").value // Include priority
+            priority: document.getElementById("editPriority").value // Will not be empty due to 'required'
         };
+
         const res = await fetch(`/${id}/edit`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         });
+
         if (res.ok) location.reload();
         else alert("Failed to edit task");
     });
