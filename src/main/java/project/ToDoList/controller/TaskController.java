@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import project.ToDoList.entity.Priority;
 import project.ToDoList.entity.Status;
 import project.ToDoList.entity.Task;
 import project.ToDoList.entity.User;
@@ -40,7 +41,8 @@ public class TaskController {
 
         model.addAttribute("user", user);
         model.addAttribute("listTasks", listTasksForUser);
-
+        model.addAttribute("priorities", Priority.values());
+        model.addAttribute("statuses", Status.values());
 
         return "tasks";
     }

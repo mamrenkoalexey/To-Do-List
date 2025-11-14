@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>My Tasks</title>
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Use Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link to external style file (Updated with rounded corners and centering fixes) -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
+<!-- Apply the content-padding-top class to ensure content clears the fixed navbar -->
 <body class="content-padding-top">
 
+<!-- Navbar (Fixed Top) -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand fs-4" href="#">
             <i class="fas fa-tasks me-2"></i> My Tasks
         </a>
         <div class="d-flex">
+            <!-- Logout Button (standard Spring Security form) -->
             <form th:action="@{/logout}" method="post" class="m-0">
                 <button type="submit" class="btn btn-outline-light btn-sm">
                     <i class="fas fa-sign-out-alt me-1"></i> Logout
@@ -28,13 +34,18 @@
 
     <h2 class="text-center text-primary mb-4">Task Management Board</h2>
 
+    <!-- === CREATE TASK FORM === -->
+    <!-- Форма теперь использует закругленные стили из style.css -->
     <form id="createForm" class="mx-auto" style="max-width: 350px;">
         <div id="new-task-form">
             <h5>Create New Task</h5>
             <input id="title" type="text" class="form-control mb-2" placeholder="Title" required>
             <textarea id="description" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
+            <!-- LocalDate: input type="date" -->
             <input id="deadline" type="date" class="form-control mb-2">
 
+            <!-- Priority is required for native validation -->
+            <!-- Используем p.displayName для отображения понятных имен -->
             <select id="priority" class="form-select mb-3" required>
                 <option value="" disabled selected>Select priority</option>
                 <option th:each="p : ${priorities}"
@@ -47,9 +58,12 @@
     </form>
 
 
+    <!-- === TASK BOARD COLUMNS === -->
     <div class="row board">
 
-        <div class="col-12 col-md-6 col-lg-3 column" id="CREATED">
+        <!-- Column: CREATED - Использован col-lg-20 для 5 колонок -->
+        <div class="col-12 col-md-6 col-lg-20 column" id="CREATED">
+            <!-- Отображаем displayName статуса -->
             <h3 th:text="${T(project.ToDoList.entity.Status).CREATED.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'CREATED'}"
                  class="task"
@@ -59,11 +73,13 @@
                 <h5 th:text="${task.title}"></h5>
                 <p th:text="${task.description}"></p>
                 <div class="task-meta">
+                    <!-- Используем task.priority.displayName для отображения понятных имен -->
                     <span th:if="${task.priority != null}"
                           class="priority-badge" th:classappend="'priority-' + ${task.priority.name()}" th:text="${task.priority.displayName}"></span>
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
+                    <!-- Формат только для LocalDate -->
                     <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
                     <span th:unless="${task.deadline}">No Deadline</span> | Created: <span th:text="${#temporals.format(task.createdAt, 'dd MMM yyyy')}"></span>
                 </div>
@@ -74,7 +90,8 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-6 col-lg-3 column" id="IN_PROGRESS">
+        <!-- Column: IN_PROGRESS - Использован col-lg-20 для 5 колонок -->
+        <div class="col-12 col-md-6 col-lg-20 column" id="IN_PROGRESS">
             <h3 th:text="${T(project.ToDoList.entity.Status).IN_PROGRESS.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'IN_PROGRESS'}"
                  class="task"
@@ -89,6 +106,7 @@
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
+                    <!-- Формат только для LocalDate -->
                     <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
                     <span th:unless="${task.deadline}">No Deadline</span> | Updated: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM yyyy')}"></span>
                 </div>
@@ -99,7 +117,8 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-6 col-lg-3 column" id="OVERDUE">
+        <!-- Column: OVERDUE (НОВАЯ КОЛОНКА) - Использован col-lg-20 для 5 колонок -->
+        <div class="col-12 col-md-6 col-lg-20 column" id="OVERDUE">
             <h3 th:text="${T(project.ToDoList.entity.Status).OVERDUE.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'OVERDUE'}"
                  class="task"
@@ -114,6 +133,7 @@
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
+                    <!-- Формат только для LocalDate -->
                     <span th:if="${task.deadline}">Overdue since: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
                     <span th:unless="${task.deadline}">No Deadline</span>
                 </div>
@@ -124,7 +144,8 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-6 col-lg-3 column" id="COMPLETED">
+        <!-- Column: COMPLETED - Использован col-lg-20 для 5 колонок -->
+        <div class="col-12 col-md-6 col-lg-20 column" id="COMPLETED">
             <h3 th:text="${T(project.ToDoList.entity.Status).COMPLETED.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'COMPLETED'}"
                  class="task"
@@ -139,6 +160,7 @@
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
+                    <!-- Формат только для LocalDate -->
                     Completed: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM yyyy')}"></span>
                 </div>
                 <div class="d-flex justify-content-between mt-2">
@@ -148,7 +170,8 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-6 col-lg-3 column" id="INACTIVE">
+        <!-- Column: INACTIVE (Archive) - Использован col-lg-20 для 5 колонок -->
+        <div class="col-12 col-md-6 col-lg-20 column" id="INACTIVE">
             <h3 th:text="${T(project.ToDoList.entity.Status).INACTIVE.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'INACTIVE'}"
                  class="task"
@@ -163,6 +186,7 @@
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
+                    <!-- Формат только для LocalDate -->
                     Archived: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM yyyy')}"></span>
                 </div>
                 <button class="btn btn-sm btn-outline-danger btn-small" onclick="deleteTask(this)">Delete</button>
@@ -171,6 +195,7 @@
     </div>
 </div>
 
+<!-- === EDIT MODAL === -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -181,10 +206,13 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="editId">
+                    <!-- Все поля используют новые закругленные стили из style.css -->
                     <input type="text" id="editTitle" class="form-control mb-2" placeholder="Title" required>
                     <textarea id="editDescription" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
+                    <!-- LocalDate: input type="date" -->
                     <input type="date" id="editDeadline" class="form-control mb-2">
 
+                    <!-- Edit Priority - dynamic list с displayName -->
                     <select id="editPriority" class="form-select mb-2" required>
                         <option value="" disabled selected>Select priority</option>
                         <option th:each="p : ${priorities}"
@@ -192,6 +220,7 @@
                                 th:text="${p.displayName}"></option>
                     </select>
 
+                    <!-- Edit Status - dynamic list с displayName -->
                     <select id="editStatus" class="form-select mb-2">
                         <option th:each="s : ${statuses}"
                                 th:value="${s.name()}"
@@ -245,6 +274,7 @@
 
         if (res.ok) location.reload();
         else {
+            // Улучшенное отображение ошибок
             const errorText = await res.text();
             alert(`Failed to update status. Server response: ${res.status} ${errorText.substring(0, 100)}...`);
         }
@@ -271,9 +301,8 @@
         document.getElementById("editTitle").value = task.querySelector("h5").innerText;
         document.getElementById("editDescription").value = task.querySelector("p").innerText;
 
-        // Set deadline date (YYYY-MM-DD)
+        // Set deadline date (YYYY-MM-DD) - использует прямой формат LocalDate
         const deadlineValue = task.dataset.deadline;
-        // Since data-deadline is already in 'YYYY-MM-DD' format, we use it directly.
         document.getElementById("editDeadline").value = deadlineValue;
 
         // Set priority
