@@ -3,24 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>My Tasks</title>
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- Use Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Link to external style file -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<!-- Apply the content-padding-top class to ensure content clears the fixed navbar -->
 <body class="content-padding-top">
 
-<!-- Navbar (Fixed Top) -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand fs-4" href="#">
             <i class="fas fa-tasks me-2"></i> My Tasks
         </a>
         <div class="d-flex">
-            <!-- Logout Button (standard Spring Security form) -->
             <form th:action="@{/logout}" method="post" class="m-0">
                 <button type="submit" class="btn btn-outline-light btn-sm">
                     <i class="fas fa-sign-out-alt me-1"></i> Logout
@@ -34,55 +28,44 @@
 
     <h2 class="text-center text-primary mb-4">Task Management Board</h2>
 
-    <!-- === CREATE TASK FORM === -->
-    <!-- Form is now used for native browser validation (required fields) -->
-    <!-- Форма создания задачи, центрированная -->
     <form id="createForm" class="mx-auto" style="max-width: 350px;">
         <div id="new-task-form">
             <h5>Create New Task</h5>
             <input id="title" type="text" class="form-control mb-2" placeholder="Title" required>
             <textarea id="description" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
-            <!-- ИЗМЕНЕНИЕ: тип изменен на "date" -->
             <input id="deadline" type="date" class="form-control mb-2">
 
-            <!-- Priority is required for native validation -->
             <select id="priority" class="form-select mb-3" required>
                 <option value="" disabled selected>Select priority</option>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
+                <option th:each="p : ${priorities}"
+                        th:value="${p.name()}"
+                        th:text="${p.displayName}"></option>
             </select>
 
-            <!-- Type submit to trigger form validation -->
             <button type="submit" id="createBtn" class="btn btn-primary w-100">Create</button>
         </div>
     </form>
 
 
-    <!-- === TASK BOARD COLUMNS === -->
-    <!-- Use row/col structure for responsive layout -->
-    <div class="row board"> <!-- Класс row восстановлен для горизонтального расположения -->
+    <div class="row board">
 
-        <!-- Column: Created (col-12 on mobile, col-md-6 on tablet, col-lg-3 on desktop) -->
-        <div class="col-12 col-md-6 col-lg-3 column" id="created">
-            <h3>Created</h3>
+        <div class="col-12 col-md-6 col-lg-3 column" id="CREATED">
+            <h3 th:text="${T(project.ToDoList.entity.Status).CREATED.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'CREATED'}"
                  class="task"
                  th:attr="data-id=${task.id},
-                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd''T''HH:mm') : ''},
+                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd') : ''},
                           data-priority=${task.priority != null ? task.priority.name() : ''}">
                 <h5 th:text="${task.title}"></h5>
                 <p th:text="${task.description}"></p>
                 <div class="task-meta">
-                    <!-- Priority badge logic -->
                     <span th:if="${task.priority != null}"
                           class="priority-badge" th:classappend="'priority-' + ${task.priority.name()}" th:text="${task.priority.displayName}"></span>
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
-                    <!-- ИЗМЕНЕНИЕ: формат отображения дедлайна - только дата -->
                     <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
-                    <span th:unless="${task.deadline}">No Deadline</span> | Created: <span th:text="${#temporals.format(task.createdAt, 'dd MMM')}"></span>
+                    <span th:unless="${task.deadline}">No Deadline</span> | Created: <span th:text="${#temporals.format(task.createdAt, 'dd MMM yyyy')}"></span>
                 </div>
                 <div class="d-flex justify-content-between mt-2">
                     <button class="btn btn-sm btn-outline-success btn-small" onclick="changeStatus(this,'IN_PROGRESS')">Start</button>
@@ -91,26 +74,23 @@
             </div>
         </div>
 
-        <!-- Column: In Progress -->
-        <div class="col-12 col-md-6 col-lg-3 column" id="inprogress">
-            <h3>In Progress</h3>
+        <div class="col-12 col-md-6 col-lg-3 column" id="IN_PROGRESS">
+            <h3 th:text="${T(project.ToDoList.entity.Status).IN_PROGRESS.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'IN_PROGRESS'}"
                  class="task"
                  th:attr="data-id=${task.id},
-                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd''T''HH:mm') : ''},
+                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd') : ''},
                           data-priority=${task.priority != null ? task.priority.name() : ''}">
                 <h5 th:text="${task.title}"></h5>
                 <p th:text="${task.description}"></p>
                 <div class="task-meta">
-                    <!-- Priority badge logic -->
                     <span th:if="${task.priority != null}"
                           class="priority-badge" th:classappend="'priority-' + ${task.priority.name()}" th:text="${task.priority.displayName}"></span>
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
-                    <!-- ИЗМЕНЕНИЕ: формат отображения дедлайна - только дата -->
                     <span th:if="${task.deadline}">Deadline: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
-                    <span th:unless="${task.deadline}">No Deadline</span> | Updated: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM')}"></span>
+                    <span th:unless="${task.deadline}">No Deadline</span> | Updated: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM yyyy')}"></span>
                 </div>
                 <div class="d-flex justify-content-between mt-2">
                     <button class="btn btn-sm btn-outline-success btn-small" onclick="changeStatus(this,'COMPLETED')">Complete</button>
@@ -119,24 +99,47 @@
             </div>
         </div>
 
-        <!-- Column: Completed -->
-        <div class="col-12 col-md-6 col-lg-3 column" id="done">
-            <h3>Completed</h3>
-            <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'COMPLETED'}"
+        <div class="col-12 col-md-6 col-lg-3 column" id="OVERDUE">
+            <h3 th:text="${T(project.ToDoList.entity.Status).OVERDUE.displayName}"></h3>
+            <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'OVERDUE'}"
                  class="task"
                  th:attr="data-id=${task.id},
-                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd''T''HH:mm') : ''},
+                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd') : ''},
                           data-priority=${task.priority != null ? task.priority.name() : ''}">
                 <h5 th:text="${task.title}"></h5>
                 <p th:text="${task.description}"></p>
                 <div class="task-meta">
-                    <!-- Priority badge logic -->
                     <span th:if="${task.priority != null}"
                           class="priority-badge" th:classappend="'priority-' + ${task.priority.name()}" th:text="${task.priority.displayName}"></span>
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
-                    Completed: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM HH:mm')}"></span>
+                    <span th:if="${task.deadline}">Overdue since: <span th:text="${#temporals.format(task.deadline, 'dd MMM yyyy')}"></span></span>
+                    <span th:unless="${task.deadline}">No Deadline</span>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <button class="btn btn-sm btn-outline-success btn-small" onclick="changeStatus(this,'IN_PROGRESS')">Resume</button>
+                    <button class="btn btn-sm btn-outline-primary btn-small" onclick="openEditModal(this)">Edit</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3 column" id="COMPLETED">
+            <h3 th:text="${T(project.ToDoList.entity.Status).COMPLETED.displayName}"></h3>
+            <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'COMPLETED'}"
+                 class="task"
+                 th:attr="data-id=${task.id},
+                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd') : ''},
+                          data-priority=${task.priority != null ? task.priority.name() : ''}">
+                <h5 th:text="${task.title}"></h5>
+                <p th:text="${task.description}"></p>
+                <div class="task-meta">
+                    <span th:if="${task.priority != null}"
+                          class="priority-badge" th:classappend="'priority-' + ${task.priority.name()}" th:text="${task.priority.displayName}"></span>
+                    <span th:unless="${task.priority != null}"
+                          class="priority-badge priority-NONE">No Priority</span>
+
+                    Completed: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM yyyy')}"></span>
                 </div>
                 <div class="d-flex justify-content-between mt-2">
                     <button class="btn btn-sm btn-outline-secondary btn-small" onclick="changeStatus(this,'INACTIVE')">Archive</button>
@@ -145,24 +148,22 @@
             </div>
         </div>
 
-        <!-- Column: Inactive -->
-        <div class="col-12 col-md-6 col-lg-3 column" id="inactive">
-            <h3>Inactive (Archive)</h3>
+        <div class="col-12 col-md-6 col-lg-3 column" id="INACTIVE">
+            <h3 th:text="${T(project.ToDoList.entity.Status).INACTIVE.displayName}"></h3>
             <div th:each="task : ${listTasks}" th:if="${task.status.name() == 'INACTIVE'}"
                  class="task"
                  th:attr="data-id=${task.id},
-                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd''T''HH:mm') : ''},
+                          data-deadline=${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd') : ''},
                           data-priority=${task.priority != null ? task.priority.name() : ''}">
                 <h5 th:text="${task.title}"></h5>
                 <p th:text="${task.description}"></p>
                 <div class="task-meta">
-                    <!-- Priority badge logic -->
                     <span th:if="${task.priority != null}"
                           class="priority-badge" th:classappend="'priority-' + ${task.priority.name()}" th:text="${task.priority.displayName}"></span>
                     <span th:unless="${task.priority != null}"
                           class="priority-badge priority-NONE">No Priority</span>
 
-                    Archived: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM')}"></span>
+                    Archived: <span th:text="${#temporals.format(task.updatedAt, 'dd MMM yyyy')}"></span>
                 </div>
                 <button class="btn btn-sm btn-outline-danger btn-small" onclick="deleteTask(this)">Delete</button>
             </div>
@@ -170,7 +171,6 @@
     </div>
 </div>
 
-<!-- === EDIT MODAL === -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -183,26 +183,22 @@
                     <input type="hidden" id="editId">
                     <input type="text" id="editTitle" class="form-control mb-2" placeholder="Title" required>
                     <textarea id="editDescription" class="form-control mb-2" placeholder="Description" maxlength="255"></textarea>
-                    <!-- ИЗМЕНЕНИЕ: тип изменен на "date" -->
                     <input type="date" id="editDeadline" class="form-control mb-2">
 
-                    <!-- NEW FIELD: Edit Priority - also required for native validation -->
                     <select id="editPriority" class="form-select mb-2" required>
                         <option value="" disabled selected>Select priority</option>
-                        <option value="LOW">Low</option>
-                        <option value="MEDIUM">Medium</option>
-                        <option value="HIGH">High</option>
+                        <option th:each="p : ${priorities}"
+                                th:value="${p.name()}"
+                                th:text="${p.displayName}"></option>
                     </select>
 
                     <select id="editStatus" class="form-select mb-2">
-                        <option value="CREATED">CREATED</option>
-                        <option value="IN_PROGRESS">IN_PROGRESS</option>
-                        <option value="COMPLETED">COMPLETED</option>
-                        <option value="INACTIVE">INACTIVE</option>
+                        <option th:each="s : ${statuses}"
+                                th:value="${s.name()}"
+                                th:text="${s.displayName}"></option>
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <!-- Removed Cancel button as requested. Close button in header remains. -->
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
@@ -214,16 +210,13 @@
 <script>
     // === CREATE TASK - Form Submission Handler ===
     document.getElementById("createForm").addEventListener("submit", async (e) => {
-        e.preventDefault(); // Prevent default form submission
-
-        // Native validation is already handled by the browser due to 'required' attributes.
+        e.preventDefault();
 
         const data = {
             title: document.getElementById("title").value,
             description: document.getElementById("description").value,
-            // Значение с инпута type="date" будет в формате YYYY-MM-DD
             deadline: document.getElementById("deadline").value,
-            priority: document.getElementById("priority").value // Will not be empty due to 'required'
+            priority: document.getElementById("priority").value
         };
 
         const res = await fetch("/create", {
@@ -260,7 +253,6 @@
     // === DELETE TASK ===
     async function deleteTask(btn) {
         const id = btn.closest(".task").dataset.id;
-        // Using confirm for simplicity, ideally replaced by a Bootstrap modal
         if (!confirm("Are you sure you want to delete this task? Task must be in Inactive status.")) return;
 
         const res = await fetch(`/${id}/delete`, { method: "POST" });
@@ -279,25 +271,18 @@
         document.getElementById("editTitle").value = task.querySelector("h5").innerText;
         document.getElementById("editDescription").value = task.querySelector("p").innerText;
 
-        // Read and set deadline from data attribute
+        // Set deadline date (YYYY-MM-DD)
         const deadlineValue = task.dataset.deadline;
-        // ИЗМЕНЕНИЕ: Для инпута type="date" нам нужна только часть даты (YYYY-MM-DD)
-        const dateOnlyValue = deadlineValue ? deadlineValue.substring(0, 10) : '';
-        document.getElementById("editDeadline").value = dateOnlyValue;
+        // Since data-deadline is already in 'YYYY-MM-DD' format, we use it directly.
+        document.getElementById("editDeadline").value = deadlineValue;
 
-        // Set priority based on data-priority attribute
+        // Set priority
         const priorityValue = task.dataset.priority;
         document.getElementById("editPriority").value = priorityValue ? priorityValue : '';
 
-        // Set the status dropdown based on the column the task is in
+        // Set the status based on the column ID
         const currentColumnId = task.closest(".column").id;
-        let currentStatus;
-        if (currentColumnId === 'created') currentStatus = 'CREATED';
-        else if (currentColumnId === 'inprogress') currentStatus = 'IN_PROGRESS';
-        else if (currentColumnId === 'done') currentStatus = 'COMPLETED';
-        else if (currentColumnId === 'inactive') currentStatus = 'INACTIVE';
-
-        document.getElementById("editStatus").value = currentStatus;
+        document.getElementById("editStatus").value = currentColumnId; // Column ID matches Status name (e.g., 'CREATED')
 
         modal.show();
     }
@@ -305,16 +290,13 @@
     document.getElementById("editForm").addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // Native validation handles 'required' fields
-
         const id = document.getElementById("editId").value;
         const data = {
             title: document.getElementById("editTitle").value,
             description: document.getElementById("editDescription").value,
-            // Значение с инпута type="date" будет в формате YYYY-MM-DD
             deadline: document.getElementById("editDeadline").value,
             status: document.getElementById("editStatus").value,
-            priority: document.getElementById("editPriority").value // Will not be empty due to 'required'
+            priority: document.getElementById("editPriority").value
         };
 
         const res = await fetch(`/${id}/edit`, {

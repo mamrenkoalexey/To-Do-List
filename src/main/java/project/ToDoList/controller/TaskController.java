@@ -12,7 +12,7 @@ import project.ToDoList.entity.User;
 import project.ToDoList.service.TaskService;
 import project.ToDoList.service.UserService;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -41,6 +41,7 @@ public class TaskController {
         model.addAttribute("user", user);
         model.addAttribute("listTasks", listTasksForUser);
 
+
         return "tasks";
     }
 
@@ -50,8 +51,8 @@ public class TaskController {
         User user = userService.findByUserName(authentication.getName());
         task.setUser(user);
         task.setStatus(Status.CREATED);
-        task.setCreatedAt(LocalDateTime.now());
-        task.setUpdatedAt(LocalDateTime.now());
+        task.setCreatedAt(LocalDate.now());
+        task.setUpdatedAt(LocalDate.now());
         Task createdTask = taskService.createTask(task);
         return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
@@ -75,7 +76,7 @@ public class TaskController {
         }
 
         task.setStatus(status);
-        task.setUpdatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDate.now());
 
         return ResponseEntity.ok(taskService.updateTask(task));
     }
@@ -98,7 +99,7 @@ public class TaskController {
         task.setPriority(updatedTask.getPriority());
 
         task.setStatus(updatedTask.getStatus());
-        task.setUpdatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDate.now());
 
         return ResponseEntity.ok(taskService.updateTask(task));
     }

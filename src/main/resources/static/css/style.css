@@ -1,25 +1,15 @@
 body {
     background-color: #f0f2f5;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
     color: #212529;
     margin: 0;
 }
 
-/* Padding to prevent fixed navbar from overlapping content */
 .content-padding-top {
     padding-top: 70px;
 }
 
-/* =========================================================
-   AUTH/FORM CENTERING STYLES (for login.html and register.html)
-   =========================================================
-*/
 
-/* Для страниц входа/регистрации, где нужно центрировать форму
-   использовался этот общий контейнер, который теперь нарушает
-   макет канбана. Мы применим центровку к body, но для Auth-страниц
-   (предполагая, что они не используют padding-top)
-*/
 body:not(.content-padding-top) {
     display: flex;
     justify-content: center;
@@ -29,74 +19,27 @@ body:not(.content-padding-top) {
 }
 
 
-/* Auth Card Styling */
-/* Этот стиль был применен к .container, который ломал макет */
-/* На страницах Auth мы предполагаем, что контейнер Bootstrap
-   используется для ограничения ширины. */
-.container > div:not(.message-error):has(form) {
+.auth-card {
     width: 100%;
-    max-width: 350px;
+    max-width: 400px;
     padding: 30px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
     text-align: center;
-    margin: auto; /* Для центрирования в контейнере */
 }
 
-input[type="text"],
-input[type="password"],
-input[type="email"],
-/* Стили для формы создания задачи */
-#new-task-form input[type="text"],
-#new-task-form textarea,
-#new-task-form input[type="date"],
-#new-task-form select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    box-sizing: border-box;
-    margin-bottom: 0 !important;
-}
-
-button[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button[type="submit"]:hover {
-    background-color: #0056b3;
-}
-
-.link {
-    display: block;
-    margin-top: 15px;
-    color: #007bff;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.link:hover {
-    text-decoration: underline;
-}
 
 .message-error {
     background-color: #f8d7da;
     color: #721c24;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
     border: 1px solid #f5c6cb;
     font-size: 14px;
     width: 100%;
-    max-width: 350px;
+    max-width: 400px;
     box-sizing: border-box;
     margin-left: auto;
     margin-right: auto;
@@ -106,40 +49,68 @@ button[type="submit"]:hover {
     margin: 0;
 }
 
-/* =========================================================
-   TASK BOARD STYLES (for tasks.html)
-   ========================================================= */
 
-/* The board container uses row/col from Bootstrap, but we keep the custom class for context */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px; /* Закругленные поля ввода */
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+button[type="submit"],
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+#new-task-form {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    width: 100%;
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#new-task-form h5 {
+    color: #007bff;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+
+
 .board {
-    display: flex; /* Используем flexbox для корректного отображения колонок в ряд */
-    flex-wrap: wrap; /* Позволяем колонкам переноситься на мобильных устройствах */
-    gap: 15px; /* Spacing between columns in the row */
-    padding: 15px 0;
-    margin: 0 -7.5px; /* компенсируем gap, так как row Bootstrap имеет отрицательный margin */
+
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
-/* Переопределяем ширину для колонок, чтобы flexbox работал с row-gap */
-.board > .col-lg-3 {
-    padding-left: 7.5px;
-    padding-right: 7.5px;
-    /* Убеждаемся, что ширина задана корректно, учитывая gap */
-    flex-basis: calc(25% - 15px);
-    max-width: calc(25% - 15px);
-    width: calc(25% - 15px);
-}
-
-/* Стили для колонок */
 .column {
     background-color: #e9ecef;
     border-radius: 8px;
     padding: 15px 10px;
     margin-bottom: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    /* Добавляем минимальную ширину для корректного отображения в ряд */
-    min-width: 200px;
-    /* Убеждаемся, что колонки занимают доступное пространство */
-    flex-grow: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* Мягкая тень для колонки */
 }
 
 
@@ -147,60 +118,60 @@ button[type="submit"]:hover {
     text-align: center;
     margin-bottom: 15px;
     color: #343a40;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     padding-bottom: 5px;
     border-bottom: 2px solid #ced4da;
 }
 
 .task {
     background-color: white;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    border: 1px solid #ced4da;
-    border-left: 5px solid;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #e0e0e0;
+    border-left: 6px solid;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Цвет левой полосы в зависимости от колонки */
-#created .task { border-left-color: #007bff; }
-#inprogress .task { border-left-color: #ffc107; }
-#done .task { border-left-color: #28a745; }
-#inactive .task { border-left-color: #6c757d; }
-
 
 .task:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
+
+
+#CREATED .task { border-left-color: #007bff; }
+#IN_PROGRESS .task { border-left-color: #ffc107; }
+#OVERDUE .task { border-left-color: #dc3545; }
+#COMPLETED .task { border-left-color: #28a745; }
+#INACTIVE .task { border-left-color: #6c757d; }
 
 .task h5 {
     margin: 0;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
     color: #343a40;
 }
 
 .task p {
     font-size: 13px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     color: #6c757d;
 }
 
-/* Style for date and priority display */
 .task-meta {
     font-size: 11px;
     color: #888;
     margin-top: 8px;
-    border-top: 1px solid #ced4da;
+    border-top: 1px solid #f0f0f0;
     padding-top: 8px;
 }
 
 .priority-badge {
     display: inline-block;
-    padding: 3px 6px;
+    padding: 4px 8px;
     border-radius: 4px;
     font-size: 10px;
     font-weight: bold;
@@ -208,24 +179,13 @@ button[type="submit"]:hover {
     color: white;
 }
 
-/* Simple Priority Colors */
+/* Priority Colors */
 .priority-LOW { background-color: #28a745; }
 .priority-MEDIUM { background-color: #ffc107; color: #343a40; }
 .priority-HIGH { background-color: #dc3545; }
 .priority-NONE { background-color: #6c757d; }
 
 .btn-small {
-    padding: 4px 8px;
+    padding: 5px 10px;
     font-size: 12px;
-}
-
-/* Task Creation Form Styling (was an Auth Card style before) */
-#new-task-form {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    width: 100%;
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
